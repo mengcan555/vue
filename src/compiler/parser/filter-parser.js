@@ -15,6 +15,7 @@ export function parseFilters (exp: string): string {
 
   for (i = 0; i < exp.length; i++) {
     prev = c
+    // exp第i的字符的ASCII码
     c = exp.charCodeAt(i)
     if (inSingle) {
       if (c === 0x27 && prev !== 0x5C) inSingle = false

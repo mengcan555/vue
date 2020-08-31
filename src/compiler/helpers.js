@@ -158,6 +158,7 @@ export function getRawBindingAttr (
     el.rawAttrsMap[name]
 }
 
+// 静态值 动态值 v-bind:一个变量  :一个变量
 export function getBindingAttr (
   el: ASTElement,
   name: string,
@@ -167,6 +168,7 @@ export function getBindingAttr (
     getAndRemoveAttr(el, ':' + name) ||
     getAndRemoveAttr(el, 'v-bind:' + name)
   if (dynamicValue != null) {
+    //
     return parseFilters(dynamicValue)
   } else if (getStatic !== false) {
     const staticValue = getAndRemoveAttr(el, name)
