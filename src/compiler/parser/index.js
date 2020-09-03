@@ -957,6 +957,7 @@ function guardIESVGBug (attrs) {
   return res
 }
 
+// 检查是否针对v-for的别名变量绑定了 v-modal 这样不合法
 function checkForAliasModel (el, value) {
   let _el = el
   while (_el) {

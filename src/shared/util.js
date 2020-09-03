@@ -106,7 +106,7 @@ export function toNumber (val: string): number | string {
 export function makeMap (
   str: string,
   expectsLowerCase?: boolean
-): (key: string) => true | void {
+): (key: string) => true | void { // 联合类型 true | void  https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/void
   const map = Object.create(null)
   const list: Array<string> = str.split(',')
   for (let i = 0; i < list.length; i++) {
