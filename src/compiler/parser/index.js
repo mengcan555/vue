@@ -903,10 +903,12 @@ function checkInFor (el: ASTElement): boolean {
   return false
 }
 
+// 解析修饰符 .prevent
 function parseModifiers (name: string): Object | void {
-  const match = name.match(modifierRE)
+  const match = name.match(modifierRE) // /g的正则mach后的结果是所有匹配字符串的数组，与不带/g不同
   if (match) {
     const ret = {}
+    // slice(1) 是为了去掉修饰符前的. 比如ret.prevent = true
     match.forEach(m => { ret[m.slice(1)] = true })
     return ret
   }
@@ -915,6 +917,7 @@ function parseModifiers (name: string): Object | void {
 function makeAttrsMap (attrs: Array<Object>): Object {
   const map = {}
   for (let i = 0, l = attrs.length; i < l; i++) {
+    // 重复的属性
     if (
       process.env.NODE_ENV !== 'production' &&
       map[attrs[i].name] && !isIE && !isEdge
@@ -925,7 +928,8 @@ function makeAttrsMap (attrs: Array<Object>): Object {
   }
   return map
 }
-
+// https://www.cnblogs.com/cc11001100/p/7189410.html
+// <script></script> 与 <style></style>中的内容不进行解码  type="text/x-template"
 // for script (e.g. type="x/template") or style, do not decode content
 function isTextTag (el): boolean {
   return el.tag === 'script' || el.tag === 'style'
