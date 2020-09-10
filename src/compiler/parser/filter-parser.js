@@ -27,12 +27,16 @@ export function parseFilters (exp: string): string {
     // charCodeAt 的反操作是 String.fromCharCode()
     c = exp.charCodeAt(i)
     if (inSingle) {
+      // 单引号闭合了''
       if (c === 0x27 && prev !== 0x5C) inSingle = false // c是单引号' pre不是反斜线 \
     } else if (inDouble) {
+      // 双引号闭合了 ”“
       if (c === 0x22 && prev !== 0x5C) inDouble = false // c是双引号 " pre不是反斜线 \
     } else if (inTemplateString) {
+      // 模板符合闭合了 ``
       if (c === 0x60 && prev !== 0x5C) inTemplateString = false // c是模板符号` pre不是反斜线 \
     } else if (inRegex) {
+      // 正则结束了 //
       if (c === 0x2f && prev !== 0x5C) inRegex = false // c是斜杠 / pre不是反斜线 \
     } else if (
       // 0x7c === 124 指代管道符 | vue的过滤器filter
@@ -93,25 +97,26 @@ export function parseFilters (exp: string): string {
     (filters || (filters = [])).push(exp.slice(lastFilterIndex, i).trim())
     lastFilterIndex = i + 1
   }
-
+  // 循环处理所有过滤器,类似于顺序函数调用
   if (filters) {
     for (i = 0; i < filters.length; i++) {
       expression = wrapFilter(expression, filters[i])
     }
   }
-
+  // 返回所有filter处理过后的表达式值
   return expression
 }
-
+// 过滤器执行
 function wrapFilter (exp: string, filter: string): string {
   const i = filter.indexOf('(')
   if (i < 0) {
+    // 没有括号,只接收唯一参数exp表达式
     // _f: resolveFilter
     // 假设过滤器是 capitalize 表达式是'aBc'
     // _f("capitalize")（'abc'）
     return `_f("${filter}")(${exp})`
   } else {
-    // 带括号 capitalize(arg1, arg2)
+    // 接收多个参数 带括号 capitalize(arg1, arg2)
     const name = filter.slice(0, i) // capitalize
     const args = filter.slice(i + 1) // arg1, arg2)
     // _f("capitalize")('aBc',arg1, arg2)

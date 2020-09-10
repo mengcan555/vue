@@ -22,15 +22,19 @@ import {
 } from '../helpers'
 
 export const onRE = /^@|^v-on:/
+// 指令正则表达式
 export const dirRE = process.env.VBIND_PROP_SHORTHAND
   ? /^v-|^@|^:|^\.|^#/
-  : /^v-|^@|^:|^#/
+  : /^v-|^@|^:|^#/ 
+
+//   
 export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
 const dynamicArgRE = /^\[.*\]$/
 
 const argRE = /:(.*)$/
+// v-bind  :  .三种 ?
 export const bindRE = /^:|^\.|^v-bind:/
 const propBindRE = /^\./
 const modifierRE = /\.[^.\]]+(?=[^\]]*$)/g
@@ -761,23 +765,30 @@ function processAttrs (el) {
   for (i = 0, l = list.length; i < l; i++) {
     name = rawName = list[i].name
     value = list[i].value
+    // 属性名是 指令
     if (dirRE.test(name)) {
       // mark element as dynamic
+      // 元素是动态的
       el.hasBindings = true
       // modifiers
+      // 修饰符
       modifiers = parseModifiers(name.replace(dirRE, ''))
       // support .foo shorthand syntax for the .prop modifier
       if (process.env.VBIND_PROP_SHORTHAND && propBindRE.test(name)) {
         (modifiers || (modifiers = {})).prop = true
         name = `.` + name.slice(1).replace(modifierRE, '')
       } else if (modifiers) {
+        // 修饰符以空格替换
         name = name.replace(modifierRE, '')
       }
       if (bindRE.test(name)) { // v-bind
         name = name.replace(bindRE, '')
+        //  v-bind:id="rawId | formatId"
         value = parseFilters(value)
+        // [arg] 动态参数
         isDynamic = dynamicArgRE.test(name)
         if (isDynamic) {
+          // 去掉首尾 [arg] -> arg
           name = name.slice(1, -1)
         }
         if (
@@ -790,13 +801,17 @@ function processAttrs (el) {
         }
         if (modifiers) {
           if (modifiers.prop && !isDynamic) {
+            // 驼峰化
             name = camelize(name)
             if (name === 'innerHtml') name = 'innerHTML'
           }
+          // .camel 驼峰化修饰符
           if (modifiers.camel && !isDynamic) {
             name = camelize(name)
           }
+          // .sync 同步修饰符
           if (modifiers.sync) {
+            // 生成赋值代码
             syncGen = genAssignmentCode(value, `$event`)
             if (!isDynamic) {
               addHandler(
@@ -892,6 +907,7 @@ function processAttrs (el) {
   }
 }
 
+// 检查是否在for里
 function checkInFor (el: ASTElement): boolean {
   let parent = el
   while (parent) {
