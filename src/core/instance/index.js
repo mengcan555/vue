@@ -18,6 +18,7 @@ initMixin(Vue)
 stateMixin(Vue)
 eventsMixin(Vue)
 lifecycleMixin(Vue)
+// 对Vue实例进行渲染Mixin（混入）
 renderMixin(Vue)
 
 export default Vue

@@ -21,6 +21,7 @@ export function installRenderHelpers (target: any) {
   target._q = looseEqual
   target._i = looseIndexOf
   target._m = renderStatic
+  // 过滤器
   target._f = resolveFilter
   target._k = checkKeyCodes
   target._b = bindObjectProps

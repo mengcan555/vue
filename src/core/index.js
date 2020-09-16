@@ -17,6 +17,13 @@ Object.defineProperty(Vue.prototype, '$ssrContext', {
 })
 
 // expose FunctionalRenderContext for ssr runtime helper installation
+// Object.defineProperty(obj, prop, descriptor)
+// descriptor: {
+//   value: 123
+//   writeable: false
+// }
+
+// Vue.FunctionalRenderContext = FunctionalRenderContext
 Object.defineProperty(Vue, 'FunctionalRenderContext', {
   value: FunctionalRenderContext
 })

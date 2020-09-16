@@ -58,8 +58,10 @@ export function setCurrentRenderingInstance (vm: Component) {
   currentRenderingInstance = vm
 }
 
+// 对Vvue实例进行渲染Mixin（混入）
 export function renderMixin (Vue: Class<Component>) {
   // install runtime convenience helpers
+  // 将一些便利的"运行时"工具安装在Vue原型上
   installRenderHelpers(Vue.prototype)
 
   Vue.prototype.$nextTick = function (fn: Function) {

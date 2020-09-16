@@ -54,6 +54,7 @@ export function parseFilters (exp: string): string {
         // 去除字符串的头尾空格
         expression = exp.slice(0, i).trim()
       } else {
+        // 表达式只会有一个 expression
         // 把过滤器存入filters数组
         pushFilter()
       }
