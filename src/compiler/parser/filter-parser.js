@@ -23,7 +23,7 @@ export function parseFilters (exp: string): string {
 
   for (i = 0; i < exp.length; i++) {
     prev = c
-    // exp第i的字符的ASCII码
+    // exp第i个字符的ASCII码
     // charCodeAt 的反操作是 String.fromCharCode()
     c = exp.charCodeAt(i)
     if (inSingle) {

@@ -79,7 +79,9 @@ export function createASTElement (
 
 /**
  * Convert HTML string to AST.
+ * 将HTML字符串转换成抽象语法树 AST
  */
+
 export function parse (
   template: string,
   options: CompilerOptions
@@ -113,7 +115,7 @@ export function parse (
       warn(msg, range)
     }
   }
-
+  // 对待闭合标签元素处理
   function closeElement (element) {
     trimEndingWhitespace(element)
     if (!inVPre && !element.processed) {
@@ -214,6 +216,7 @@ export function parse (
     shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
     shouldKeepComment: options.comments,
     outputSourceRange: options.outputSourceRange,
+    //
     start (tag, attrs, unary, start, end) {
       // check namespace.
       // inherit parent ns if there is one
@@ -300,7 +303,7 @@ export function parse (
         closeElement(element)
       }
     },
-
+    // 闭合一个标签
     end (tag, start, end) {
       const element = stack[stack.length - 1]
       // pop stack
@@ -309,10 +312,12 @@ export function parse (
       if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
         element.end = end
       }
+      // 闭合标签元素
       closeElement(element)
     },
 
     chars (text: string, start: number, end: number) {
+      // text文本没有父节点,给出错误信息
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
           if (text === template) {
@@ -359,6 +364,7 @@ export function parse (
           // condense consecutive whitespaces into single space
           text = text.replace(whitespaceRE, ' ')
         }
+        // 为text创建ASTNode
         let res
         let child: ?ASTNode
         if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {

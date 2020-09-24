@@ -103,6 +103,7 @@ export function toNumber (val: string): number | string {
  * Make a map and return a function for checking if a key
  * is in that map.
  */
+// 将字符串分隔成数组, 然后建一个map 最后返回一个function
 export function makeMap (
   str: string,
   expectsLowerCase?: boolean
@@ -142,6 +143,7 @@ export function remove (arr: Array<any>, item: any): Array<any> | void {
 /**
  * Check whether an object has the property.
  */
+// 检查对象是否有相应的自身属性，非继承属性
 const hasOwnProperty = Object.prototype.hasOwnProperty
 export function hasOwn (obj: Object | Array<*>, key: string): boolean {
   return hasOwnProperty.call(obj, key)
