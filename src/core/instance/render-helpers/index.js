@@ -15,6 +15,7 @@ import { bindDynamicKeys, prependModifier } from './bind-dynamic-keys'
 export function installRenderHelpers (target: any) {
   target._o = markOnce
   target._n = toNumber
+  // 文本解析器
   target._s = toString
   target._l = renderList
   target._t = renderSlot
