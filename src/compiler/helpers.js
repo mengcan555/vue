@@ -25,10 +25,13 @@ export function addProp (el: ASTElement, name: string, value: string, range?: Ra
   el.plain = false
 }
 
+// 添加属性到 元素el的动态属性数组dynamicAttrs 或 静态属性数组attrs中
 export function addAttr (el: ASTElement, name: string, value: any, range?: Range, dynamic?: boolean) {
   const attrs = dynamic
     ? (el.dynamicAttrs || (el.dynamicAttrs = []))
     : (el.attrs || (el.attrs = []))
+  
+  // 为item设置范围, 包括开始和结束 {start: range.start, end: range.end}
   attrs.push(rangeSetItem({ name, value, dynamic }, range))
   el.plain = false
 }
@@ -149,6 +152,7 @@ export function addHandler (
   el.plain = false
 }
 
+// 获取el的name属性
 export function getRawBindingAttr (
   el: ASTElement,
   name: string
@@ -157,8 +161,8 @@ export function getRawBindingAttr (
     el.rawAttrsMap['v-bind:' + name] ||
     el.rawAttrsMap[name]
 }
-
-// 静态值 动态值 v-bind:一个变量  :一个变量
+// 获取el的名为name的属性值（可能是动态绑定值, 也可能是静态属性值）
+// 动态值 v-bind:一个变量  :一个变量
 export function getBindingAttr (
   el: ASTElement,
   name: string,
@@ -168,9 +172,10 @@ export function getBindingAttr (
     getAndRemoveAttr(el, ':' + name) ||
     getAndRemoveAttr(el, 'v-bind:' + name)
   if (dynamicValue != null) {
-    //
+    // 动态值调用过滤器filter解析
     return parseFilters(dynamicValue)
   } else if (getStatic !== false) {
+    // 获取静态值
     const staticValue = getAndRemoveAttr(el, name)
     if (staticValue != null) {
       return JSON.stringify(staticValue)
@@ -182,6 +187,8 @@ export function getBindingAttr (
 // doesn't get processed by processAttrs.
 // By default it does NOT remove it from the map (attrsMap) because the map is
 // needed during codegen.
+
+// 只从el的attrsList数组中删除name属性, attrsMap对象中保留
 export function getAndRemoveAttr (
   el: ASTElement,
   name: string,
@@ -200,9 +207,11 @@ export function getAndRemoveAttr (
   if (removeFromMap) {
     delete el.attrsMap[name]
   }
+  // 返回属性值
   return val
 }
 
+// 根据正则获取属性, 并从attrsList中删除该属性
 export function getAndRemoveAttrByRegex (
   el: ASTElement,
   name: RegExp
@@ -210,22 +219,28 @@ export function getAndRemoveAttrByRegex (
   const list = el.attrsList
   for (let i = 0, l = list.length; i < l; i++) {
     const attr = list[i]
+    // 正则测试
     if (name.test(attr.name)) {
+      // 删除属性attr
       list.splice(i, 1)
+      // 返回属性 attr
       return attr
     }
   }
 }
 
+// 为item设置范围, 包括开始和结束
 function rangeSetItem (
   item: any,
   range?: { start?: number, end?: number }
 ) {
   if (range) {
     if (range.start != null) {
+      // 设置开始
       item.start = range.start
     }
     if (range.end != null) {
+      // 设置结束
       item.end = range.end
     }
   }
