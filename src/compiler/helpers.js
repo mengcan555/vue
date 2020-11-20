@@ -20,6 +20,7 @@ export function pluckModuleFunction<F: Function> (
     : []
 }
 
+// 
 export function addProp (el: ASTElement, name: string, value: string, range?: Range, dynamic?: boolean) {
   (el.props || (el.props = [])).push(rangeSetItem({ name, value, dynamic }, range))
   el.plain = false
@@ -42,6 +43,7 @@ export function addRawAttr (el: ASTElement, name: string, value: any, range?: Ra
   el.attrsList.push(rangeSetItem({ name, value }, range))
 }
 
+// 为el添加指令
 export function addDirective (
   el: ASTElement,
   name: string,
@@ -63,12 +65,14 @@ export function addDirective (
   el.plain = false
 }
 
+// 为修饰符增加 前缀标记
 function prependModifierMarker (symbol: string, name: string, dynamic?: boolean): string {
   return dynamic
     ? `_p(${name},"${symbol}")`
-    : symbol + name // mark the event as captured
+    : symbol + name // mark the event as captured  将事件标记为已捕获
 }
 
+// 增加事件处理器
 export function addHandler (
   el: ASTElement,
   name: string,
@@ -79,20 +83,24 @@ export function addHandler (
   range?: Range,
   dynamic?: boolean
 ) {
+  // emptyObject 为 Object.freeze({}) 一个冻结的空对象,再也不可以被修改
   modifiers = modifiers || emptyObject
+  // 对同时使用prevent和passive修饰符 发出警告信息
+  // prevent 是拦截默认事件, passive(提高性能的)是不拦截默认事件。
   // warn prevent and passive modifier
   /* istanbul ignore if */
   if (
     process.env.NODE_ENV !== 'production' && warn &&
     modifiers.prevent && modifiers.passive
   ) {
+    // passsive和prevent修饰符不能同时使用, passive 处理器不阻止默认事件
     warn(
       'passive and prevent can\'t be used together. ' +
       'Passive handler can\'t prevent default event.',
       range
     )
   }
-
+  // 规范化 鼠标右键 和 鼠标中键 的单击事件 click.right click.middle : click的right middle修饰符
   // normalize click.right and click.middle since they don't actually fire
   // this is technically browser-specific, but at least for now browsers are
   // the only target envs that have right/middle clicks.
@@ -111,44 +119,61 @@ export function addHandler (
     }
   }
 
+  // 添加事件监听器时使用事件捕获模式
+  // 即内部元素触发的事件先在此处理，然后才交由内部元素进行处理
+  // <div v-on:click.capture="doThis">...</div>
+
   // check capture modifier
+  // 检查捕获修饰符
   if (modifiers.capture) {
     delete modifiers.capture
+    // 为修饰符增加 前缀标记
     name = prependModifierMarker('!', name, dynamic)
   }
+  // once修饰符
   if (modifiers.once) {
     delete modifiers.once
     name = prependModifierMarker('~', name, dynamic)
   }
   /* istanbul ignore if */
+  // passive修饰符
   if (modifiers.passive) {
     delete modifiers.passive
     name = prependModifierMarker('&', name, dynamic)
   }
 
   let events
+  // .native修饰符 监听节点的原生事件
   if (modifiers.native) {
     delete modifiers.native
+    // 获取 原生事件
     events = el.nativeEvents || (el.nativeEvents = {})
   } else {
+    // 获取 自定义事件
     events = el.events || (el.events = {})
   }
 
+  // 产生新的处理器 
   const newHandler: any = rangeSetItem({ value: value.trim(), dynamic }, range)
   if (modifiers !== emptyObject) {
     newHandler.modifiers = modifiers
   }
 
+  // 获取name事件的 处理器
   const handlers = events[name]
   /* istanbul ignore if */
+  // 数组
   if (Array.isArray(handlers)) {
+    // 数组的前插 或者 后插
     important ? handlers.unshift(newHandler) : handlers.push(newHandler)
   } else if (handlers) {
+    // 重要就把新处理器放数组前面
     events[name] = important ? [newHandler, handlers] : [handlers, newHandler]
   } else {
+    // 只有一个新处理器
     events[name] = newHandler
   }
-
+  // 标记el为非纯元素
   el.plain = false
 }
 

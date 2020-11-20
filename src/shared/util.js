@@ -229,11 +229,14 @@ export function toArray (list: any, start?: number): Array<any> {
 
 /**
  * Mix properties into target object.
+ * 将源对象_from中的属性混入目标对象to
  */
 export function extend (to: Object, _from: ?Object): Object {
+  // 遍历_from中的所有属性
   for (const key in _from) {
     to[key] = _from[key]
   }
+  // 返回目标对象
   return to
 }
 
