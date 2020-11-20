@@ -1252,7 +1252,7 @@ function checkForAliasModel (el, value) {
         el.rawAttrsMap['v-model']
       )
     }
-    // 从子节点网上逐层判断
+    // 从子节点往上逐层判断
     _el = _el.parent
   }
 }
