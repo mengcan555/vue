@@ -1,5 +1,6 @@
 /* @flow */
 
+// 导出shared/util里的所有函数
 export * from 'shared/util'
 export * from './lang'
 export * from './env'

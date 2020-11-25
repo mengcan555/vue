@@ -2738,6 +2738,7 @@ function checkKeyCodes (
 /*  */
 
 /**
+ * 将 v-bind={}合并到一个VNode虚拟节点的数据中的 运行时帮助程序
  * Runtime helper for merging v-bind="object" into a VNode's data.
  */
 function bindObjectProps (

@@ -34,6 +34,7 @@ export function isPrimitive (value: any): boolean %checks {
 }
 
 /**
+ * 快速对象检测
  * Quick object check - this is primarily used to tell
  * Objects from primitive values when we know the value
  * is a JSON-compliant type.
@@ -43,6 +44,7 @@ export function isObject (obj: mixed): boolean %checks {
 }
 
 /**
+ * 获取一个值的原始类型字符串
  * Get the raw type string of a value, e.g., [object Object].
  */
 const _toString = Object.prototype.toString
@@ -52,10 +54,13 @@ export function toRawType (value: any): string {
 }
 
 /**
+ * 严格的对象类型检测, 只有纯JavaScript对象才会返回true, 数组会返回false 因为类型字符串是 '[object Array]'
+ * 字符串返回true
  * Strict object type check. Only returns true
  * for plain JavaScript objects.
  */
 export function isPlainObject (obj: any): boolean {
+  // Object.prototype.toString
   return _toString.call(obj) === '[object Object]'
 }
 
@@ -124,6 +129,7 @@ export function makeMap (
 export const isBuiltInTag = makeMap('slot,component', true)
 
 /**
+ * 检查一个属性是否是一个预留属性
  * Check if an attribute is a reserved attribute.
  */
 export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')
@@ -161,6 +167,7 @@ export function cached<F: Function> (fn: F): F {
 }
 
 /**
+ * 将一个用连字符-分隔的字符串 驼峰化 abc_de_fg => abcDeFg
  * Camelize a hyphen-delimited string.
  */
 const camelizeRE = /-(\w)/g
@@ -176,10 +183,12 @@ export const capitalize = cached((str: string): string => {
 })
 
 /**
+ * 将一个驼峰式的字符串 转换成 用连字符-分隔的字符串
  * Hyphenate a camelCase string.
  */
 const hyphenateRE = /\B([A-Z])/g
 export const hyphenate = cached((str: string): string => {
+  // abcDefGh => abc-Def-Gh => abc-def-gh
   return str.replace(hyphenateRE, '-$1').toLowerCase()
 })
 
@@ -241,21 +250,25 @@ export function extend (to: Object, _from: ?Object): Object {
 }
 
 /**
+ * 将一个对象数组中的多个对象 合并成一个对象
  * Merge an Array of Objects into a single Object.
  */
 export function toObject (arr: Array<any>): Object {
   const res = {}
   for (let i = 0; i < arr.length; i++) {
     if (arr[i]) {
+      // 将对象arr[i]合并到res
       extend(res, arr[i])
     }
   }
+  // 返回合并后的对象
   return res
 }
 
 /* eslint-disable no-unused-vars */
 
 /**
+ * 不执行任何操作
  * Perform no operation.
  * Stubbing args to make Flow happy without leaving useless transpiled code
  * with ...rest (https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/).
