@@ -295,9 +295,10 @@ export function parse (
         if (options.outputSourceRange) {
           element.start = start
           element.end = end
-          // 
+          // 累计
           element.rawAttrsMap = element.attrsList.reduce((cumulated, attr) => {
             cumulated[attr.name] = attr
+            // 返回累积值
             return cumulated
           }, {})
         }
@@ -1183,10 +1184,11 @@ function makeAttrsMap (attrs: Array<Object>): Object {
   for (let i = 0, l = attrs.length; i < l; i++) {
     // 重复的属性
     if (
-      // 非生产环境 && 有次属性名 && 不是IE && 不是Edge, 给出错误信息
+      // 非生产环境 && 有此属性名 && 不是IE && 不是Edge, 给出错误信息
       process.env.NODE_ENV !== 'production' &&
       map[attrs[i].name] && !isIE && !isEdge
     ) {
+      // 属性重复
       warn('duplicate attribute: ' + attrs[i].name, attrs[i])
     }
     // 建立属性map对象

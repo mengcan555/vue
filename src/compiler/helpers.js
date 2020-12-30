@@ -100,21 +100,27 @@ export function addHandler (
       range
     )
   }
-  // 规范化 鼠标右键 和 鼠标中键 的单击事件 click.right click.middle : click的right middle修饰符
+  // 规范化 鼠标右键 和 鼠标中键 的单击事件, 因为它们不会真正触发 click.right click.middle : click的right middle修饰符
   // normalize click.right and click.middle since they don't actually fire
   // this is technically browser-specific, but at least for now browsers are
   // the only target envs that have right/middle clicks.
+  // 有.right修饰符
   if (modifiers.right) {
     if (dynamic) {
+      // 如果name为click, 重新赋值为contextmenu, 否则保持不变
       name = `(${name})==='click'?'contextmenu':(${name})`
     } else if (name === 'click') {
+      // 上下文菜单
       name = 'contextmenu'
       delete modifiers.right
     }
+  // 有.middle修饰符
   } else if (modifiers.middle) {
     if (dynamic) {
+      // 如果name为click, 重新赋值为mouseup, 否则保持不变
       name = `(${name})==='click'?'mouseup':(${name})`
     } else if (name === 'click') {
+      // 鼠标上移
       name = 'mouseup'
     }
   }
@@ -182,6 +188,7 @@ export function getRawBindingAttr (
   el: ASTElement,
   name: string
 ) {
+  // 在el的rawAttrsMap中查找
   return el.rawAttrsMap[':' + name] ||
     el.rawAttrsMap['v-bind:' + name] ||
     el.rawAttrsMap[name]
@@ -197,7 +204,7 @@ export function getBindingAttr (
     getAndRemoveAttr(el, ':' + name) ||
     getAndRemoveAttr(el, 'v-bind:' + name)
   if (dynamicValue != null) {
-    // 动态值调用过滤器filter解析
+    // 动态值调用过滤器filter解析 (过滤器可以用在两个地方, {{插值}} 和 v-bind表达式中)
     return parseFilters(dynamicValue)
   } else if (getStatic !== false) {
     // 获取静态值
@@ -213,15 +220,17 @@ export function getBindingAttr (
 // By default it does NOT remove it from the map (attrsMap) because the map is
 // needed during codegen.
 
-// 只从el的attrsList数组中删除name属性, attrsMap对象中保留
+// 只从el的attrsList数组中删除名字为name的属性, 默认attrsMap对象中保留以备codegen需要
 export function getAndRemoveAttr (
   el: ASTElement,
   name: string,
   removeFromMap?: boolean
 ): ?string {
   let val
+  // 如果属性值非null
   if ((val = el.attrsMap[name]) != null) {
     const list = el.attrsList
+    // 遍历attrsList 删除符合条件的属性
     for (let i = 0, l = list.length; i < l; i++) {
       if (list[i].name === name) {
         list.splice(i, 1)
@@ -229,6 +238,7 @@ export function getAndRemoveAttr (
       }
     }
   }
+  // 在attrsMap中删除该属性
   if (removeFromMap) {
     delete el.attrsMap[name]
   }
@@ -241,14 +251,16 @@ export function getAndRemoveAttrByRegex (
   el: ASTElement,
   name: RegExp
 ) {
+  // 获取el的属性列表
   const list = el.attrsList
+  // 遍历所有属性, 在属性列表中删除满足正则的属性,并将此属性作为函数返回值
   for (let i = 0, l = list.length; i < l; i++) {
     const attr = list[i]
     // 正则测试
     if (name.test(attr.name)) {
       // 删除属性attr
       list.splice(i, 1)
-      // 返回属性 attr
+      // 返回删除的属性 attr
       return attr
     }
   }

@@ -96,6 +96,7 @@ export function toString (val: any): string {
 }
 
 /**
+ * 将输入值转换为数字来保存, 如果转换失败, 返回原始的字符串
  * Convert an input value to a number for persistence.
  * If the conversion fails, return original string.
  */
@@ -125,6 +126,7 @@ export function makeMap (
 
 /**
  * Check if a tag is a built-in tag.
+ * 检查一个标签是否是 内置标签(slot component)
  */
 export const isBuiltInTag = makeMap('slot,component', true)
 
@@ -157,11 +159,14 @@ export function hasOwn (obj: Object | Array<*>, key: string): boolean {
 
 /**
  * Create a cached version of a pure function.
+ * 为纯函数创建一个缓存版本
  */
 export function cached<F: Function> (fn: F): F {
   const cache = Object.create(null)
   return (function cachedFn (str: string) {
+    // 缓存值
     const hit = cache[str]
+    // 命中就返回缓存, 否则重新调用fn计算
     return hit || (cache[str] = fn(str))
   }: any)
 }

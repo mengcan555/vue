@@ -14,6 +14,7 @@ import { bindDynamicKeys, prependModifier } from './bind-dynamic-keys'
 
 export function installRenderHelpers (target: any) {
   target._o = markOnce
+  // 将输入值转换为数字来保存, 如果转换失败, 返回原始的字符串
   target._n = toNumber
   // 文本解析器
   target._s = toString
