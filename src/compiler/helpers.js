@@ -11,10 +11,12 @@ export function baseWarn (msg: string, range?: Range) {
 }
 /* eslint-enable no-unused-vars */
 
+// 从modules中摘取相应的函数
 export function pluckModuleFunction<F: Function> (
   modules: ?Array<Object>,
   key: string
 ): Array<F> {
+  // 返回modules中所有 非空的 键值为key的组成一个新的数组
   return modules
     ? modules.map(m => m[key]).filter(_ => _)
     : []

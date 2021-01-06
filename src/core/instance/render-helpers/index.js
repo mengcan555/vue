@@ -18,10 +18,12 @@ export function installRenderHelpers (target: any) {
   target._n = toNumber
   // 文本解析器
   target._s = toString
+  // 渲染v-for里的列表
   target._l = renderList
   target._t = renderSlot
   target._q = looseEqual
   target._i = looseIndexOf
+  // 渲染静态树
   target._m = renderStatic
   // 过滤器
   target._f = resolveFilter

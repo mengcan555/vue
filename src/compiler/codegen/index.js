@@ -10,6 +10,7 @@ type TransformFunction = (el: ASTElement, code: string) => string;
 type DataGenFunction = (el: ASTElement) => string;
 type DirectiveFunction = (el: ASTElement, dir: ASTDirective, warn: Function) => boolean;
 
+// 代码生成的 状态
 export class CodegenState {
   options: CompilerOptions;
   warn: Function;
@@ -24,10 +25,12 @@ export class CodegenState {
   constructor (options: CompilerOptions) {
     this.options = options
     this.warn = options.warn || baseWarn
+    // pluckModuleFunction 从modules中摘取相应key的函数
     this.transforms = pluckModuleFunction(options.modules, 'transformCode')
     this.dataGenFns = pluckModuleFunction(options.modules, 'genData')
     this.directives = extend(extend({}, baseDirectives), options.directives)
     const isReservedTag = options.isReservedTag || no
+    // 是组件 (el.component非空 或者 el.tag不是预留的标签)
     this.maybeComponent = (el: ASTElement) => !!el.component || !isReservedTag(el.tag)
     this.onceId = 0
     this.staticRenderFns = []
@@ -35,33 +38,45 @@ export class CodegenState {
   }
 }
 
+// 代码生成 的结果
 export type CodegenResult = {
   render: string,
   staticRenderFns: Array<string>
 };
 
+// 生成最终的 代码生成结果（渲染函数 和 静态渲染函数）
 export function generate (
   ast: ASTElement | void,
   options: CompilerOptions
 ): CodegenResult {
+
+  // 初始化代码生成的状态
   const state = new CodegenState(options)
+  // vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
+
+  // 产生生成元素的 函数代码
   const code = ast ? genElement(ast, state) : '_c("div")'
   return {
+    // with主要用来对对象取值
     render: `with(this){return ${code}}`,
     staticRenderFns: state.staticRenderFns
   }
 }
 
+// 产生 生成元素 的代码
 export function genElement (el: ASTElement, state: CodegenState): string {
   if (el.parent) {
     el.pre = el.pre || el.parent.pre
   }
 
   if (el.staticRoot && !el.staticProcessed) {
+    // 提出 静态子树
     return genStatic(el, state)
   } else if (el.once && !el.onceProcessed) {
+    // v-once指令的处理
     return genOnce(el, state)
   } else if (el.for && !el.forProcessed) {
+    // 
     return genFor(el, state)
   } else if (el.if && !el.ifProcessed) {
     return genIf(el, state)
@@ -96,17 +111,25 @@ export function genElement (el: ASTElement, state: CodegenState): string {
 }
 
 // hoist static sub-trees out
+// 提出静态子树
 function genStatic (el: ASTElement, state: CodegenState): string {
+  // 标记位
   el.staticProcessed = true
   // Some elements (templates) need to behave differently inside of a v-pre
   // node.  All pre nodes are static roots, so we can use this as a location to
   // wrap a state change and reset it upon exiting the pre node.
+
+  // 有些元素(模板)需要在v-pre节点中有不同的行为
+  // 所有的pre节点都是静态根, 因此我们可以将其用作包装更改的位置,并在退出pre节点时将其重置
   const originalPreState = state.pre
   if (el.pre) {
     state.pre = el.pre
   }
   state.staticRenderFns.push(`with(this){return ${genElement(el, state)}}`)
   state.pre = originalPreState
+
+  //  渲染静态树
+  // target._m = renderStatic
   return `_m(${
     state.staticRenderFns.length - 1
   }${
@@ -115,6 +138,7 @@ function genStatic (el: ASTElement, state: CodegenState): string {
 }
 
 // v-once
+// 针对v-once只渲染一次的元素处理
 function genOnce (el: ASTElement, state: CodegenState): string {
   el.onceProcessed = true
   if (el.if && !el.ifProcessed) {
@@ -183,6 +207,7 @@ function genIfConditions (
   }
 }
 
+// 为v-for生成元素
 export function genFor (
   el: any,
   state: CodegenState,
@@ -200,6 +225,7 @@ export function genFor (
     el.tag !== 'template' &&
     !el.key
   ) {
+    // 当v-for没有提供key值时, 给出警告
     state.warn(
       `<${el.tag} v-for="${alias} in ${exp}">: component lists rendered with ` +
       `v-for should have explicit keys. ` +
@@ -209,7 +235,10 @@ export function genFor (
     )
   }
 
+  // 避免递归
   el.forProcessed = true // avoid recursion
+  // 返回渲染列表
+  // target._l = renderList
   return `${altHelper || '_l'}((${exp}),` +
     `function(${alias}${iterator1}${iterator2}){` +
       `return ${(altGen || genElement)(el, state)}` +
