@@ -1,4 +1,23 @@
-/* @flow */
+/* @flow */ 
+// https://flow.org/
+
+// 1. maybe type
+// function acceptsMaybeNumber(value: ?number) { // maybe type  数字 or null or undefined
+//   // ...
+// }
+// acceptsMaybeNumber(42);        // Works!
+// acceptsMaybeNumber();          // Works!
+// acceptsMaybeNumber(undefined); // Works!
+// acceptsMaybeNumber(null);      // Works!
+// acceptsMaybeNumber("42");      // Error!
+
+// 2. object optional property syntax
+// @flow
+// var obj: { foo?: boolean } = {};
+
+// 1 and 2 可以一起用
+// { value?: ?number }
+
 
 import { emptyObject } from 'shared/util'
 import { parseFilters } from './parser/filter-parser'
@@ -22,7 +41,7 @@ export function pluckModuleFunction<F: Function> (
     : []
 }
 
-// 
+// 往属性数组el.props中添加新元素
 export function addProp (el: ASTElement, name: string, value: string, range?: Range, dynamic?: boolean) {
   (el.props || (el.props = [])).push(rangeSetItem({ name, value, dynamic }, range))
   el.plain = false
@@ -40,6 +59,7 @@ export function addAttr (el: ASTElement, name: string, value: any, range?: Range
 }
 
 // add a raw attr (use this in preTransforms)
+// 增加原始属性（ 在预转换中使用 ）
 export function addRawAttr (el: ASTElement, name: string, value: any, range?: Range) {
   el.attrsMap[name] = value
   el.attrsList.push(rangeSetItem({ name, value }, range))
