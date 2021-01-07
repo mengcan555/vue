@@ -54,7 +54,7 @@ export function generate (
   const state = new CodegenState(options)
   // vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
 
-  // 产生生成元素的 函数代码
+  // 产生 生成元素的 函数代码
   const code = ast ? genElement(ast, state) : '_c("div")'
   return {
     // with主要用来对对象取值
@@ -125,6 +125,7 @@ function genStatic (el: ASTElement, state: CodegenState): string {
   if (el.pre) {
     state.pre = el.pre
   }
+  // 生成静态函数 并将其添加到 静态渲染函数数组中
   state.staticRenderFns.push(`with(this){return ${genElement(el, state)}}`)
   state.pre = originalPreState
 
@@ -140,8 +141,10 @@ function genStatic (el: ASTElement, state: CodegenState): string {
 // v-once
 // 针对v-once只渲染一次的元素处理
 function genOnce (el: ASTElement, state: CodegenState): string {
+  // 标记已经处理
   el.onceProcessed = true
   if (el.if && !el.ifProcessed) {
+    // 
     return genIf(el, state)
   } else if (el.staticInFor) {
     let key = ''
@@ -166,16 +169,18 @@ function genOnce (el: ASTElement, state: CodegenState): string {
   }
 }
 
+// 
 export function genIf (
   el: any,
   state: CodegenState,
   altGen?: Function,
   altEmpty?: string
 ): string {
-  el.ifProcessed = true // avoid recursion
+  el.ifProcessed = true // avoid recursion 避免递归
   return genIfConditions(el.ifConditions.slice(), state, altGen, altEmpty)
 }
 
+// 
 function genIfConditions (
   conditions: ASTIfConditions,
   state: CodegenState,
@@ -183,14 +188,20 @@ function genIfConditions (
   altEmpty?: string
 ): string {
   if (!conditions.length) {
+    // 创建空的虚拟节点
+    // target._e = createEmptyVNode
     return altEmpty || '_e()'
   }
 
+  // 取第一个
   const condition = conditions.shift()
+  // if的表达式非空
   if (condition.exp) {
     return `(${condition.exp})?${
+      // 产生三元表达式
       genTernaryExp(condition.block)
     }:${
+      // 递归处理
       genIfConditions(conditions, state, altGen, altEmpty)
     }`
   } else {
@@ -198,6 +209,7 @@ function genIfConditions (
   }
 
   // v-if with v-once should generate code like (a)?_m(0):_m(1)
+  // 具有v-once的v-if 产生的代码类似于 (a)?_m(0):_m(1)  _m是渲染静态树
   function genTernaryExp (el) {
     return altGen
       ? altGen(el, state)
@@ -207,7 +219,7 @@ function genIfConditions (
   }
 }
 
-// 为v-for生成元素
+// 为v-for生成代码
 export function genFor (
   el: any,
   state: CodegenState,
@@ -568,6 +580,7 @@ export function genText (text: ASTText | ASTExpression): string {
   })`
 }
 
+// 为注释生成代码 _e创建空的虚拟节点
 export function genComment (comment: ASTText): string {
   return `_e(${JSON.stringify(comment.text)})`
 }

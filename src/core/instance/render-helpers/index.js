@@ -27,12 +27,15 @@ export function installRenderHelpers (target: any) {
   target._m = renderStatic
   // 过滤器
   target._f = resolveFilter
+  // 检查keycodes
   target._k = checkKeyCodes
   target._b = bindObjectProps
   target._v = createTextVNode
+  // 创建空的虚拟节点
   target._e = createEmptyVNode
   target._u = resolveScopedSlots
   target._g = bindObjectListeners
+  // 绑定动态的key
   target._d = bindDynamicKeys
   target._p = prependModifier
 }
